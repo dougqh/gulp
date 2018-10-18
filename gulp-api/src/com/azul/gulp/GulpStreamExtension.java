@@ -1,5 +1,7 @@
 package com.azul.gulp;
 
+import java.util.Set;
+
 public interface GulpStreamExtension<E extends GulpStreamExtension<E, T>, T> 
   extends GulpStream<T>
 {
