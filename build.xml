@@ -1,0 +1,31 @@
+<project name="gulp" basedir="." default="package">
+  <property name="projects.dir" location="." />
+  <import file="./azul-build-macros.xml" />
+
+  <target name="clean">
+    <azul.project-clean project="gulp-core" />
+  	<azul.project-clean project="gulp-text" />
+  	
+  	<azul.clean />
+  </target>
+
+  <target name="prepare">
+    <azul.project-prepare project="gulp-core" />
+  	<azul.project-prepare project="gulp-text" />
+  </target>
+
+  <target name="compile" depends="prepare">
+    <azul.project-compile project="gulp-core" />
+  	<azul.project-compile project="gulp-text" />
+  </target>
+    
+  <target name="package" depends="compile">
+  	<azul.project-install project="gulp-core" todir="@{project.build.dir}" />
+  	<azul.project-install project="gulp-text" todir="@{project.build.dir}" />
+  </target>
+  
+  <target name="install" depends="package">
+  	<azul.project-install project="gulp-core" todir="@{project.build.dir}" />
+  	<azul.project-install project="gulp-text" todir="@{project.build.dir}" />
+  </target>
+</project>

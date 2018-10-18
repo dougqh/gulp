@@ -1,0 +1,47 @@
+<project name="gulp-core" basedir="." default="package">
+  <property name="build.project.dir" location=".." />
+  <import file="${build.project.dir}/azul-build-macros.xml" />
+
+  <target name="clean">
+    <azul.project-clean project="gulp-api" />
+  	<azul.project-clean project="gulp-inject" />
+  	<azul.project-clean project="gulp-nexus" />
+  	<azul.project-clean project="gulp-foundations" />
+  	
+  	<azul.clean />
+  </target>
+
+  <target name="prepare">
+    <azul.project-prepare project="gulp-api" />
+  	<azul.project-prepare project="gulp-inject" />
+  	<azul.project-prepare project="gulp-nexus" />
+  	<azul.project-prepare project="gulp-foundations" />
+  </target>
+
+  <target name="compile" depends="prepare">
+    <azul.project-compile project="gulp-api" />
+  	<azul.project-compile project="gulp-inject" />
+  	<azul.project-compile project="gulp-nexus" />
+  	<azul.project-compile project="gulp-foundations" />
+  </target>
+    
+  <target name="package" depends="compile">
+    <azul.project-package project="gulp-api" />
+  	<azul.project-package project="gulp-inject" />
+  	<azul.project-package project="gulp-nexus" />
+  	<azul.project-package project="gulp-foundations" />
+  	
+  	<echo message="projects.dir: ${projects.dir}" />
+  	
+  	<azul.megajar>
+  	  <zipfileset src="${projects.dir}/gulp-api/build/gulp-api.jar" />
+  	  <zipfileset src="${projects.dir}/gulp-inject/build/gulp-inject.jar" />
+  	  <zipfileset src="${projects.dir}/gulp-nexus/build/gulp-nexus.jar" />
+  	  <zipfileset src="${projects.dir}/gulp-foundations/build/gulp-foundations.jar" />
+  	</azul.megajar>
+  </target>
+  
+  <target name="install" depends="package">
+    <azul.install />
+  </target>
+</project>

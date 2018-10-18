@@ -3,16 +3,19 @@
         <fail message="zz-unrunnable"/>
     </target>
 
+	<property name="projects.dir" location=".." />
     <property name="project.dir" location="${basedir}" />
     <property name="project.name" value="${ant.project.name}" />
     
-    <property name="repository.dir" location="${build.project.dir}/central-repo" />
-    <!-- <property name="project.repository.dir" location="${project.dir}/repo-lib" /> -->
-    <property name="project.repository.dir" location="${build.project.dir}/project-repos/${project.name}" />
+    <property name="repository.dir" location="${projects.dir}/.repo" />
     
-    <property name="src.dir" location="src" />
-    <property name="build.dir" location="${build.project.dir}/build" />
-    <property name="project.build.dir" location="${build.dir}/${project.name}" />
+	<property name="project.lib.dir" location="${project.dir}/lib" />
+	<property name="project.extlib.dir" location="${project.dir}/ext-lib" />
+	
+	<property name="install.dir" location="${repository.dir}" />
+    
+    <property name="src.dir" location="${project.dir}/src" />
+    <property name="project.build.dir" location="${project.dir}/build" />
     <property name="class.dir" location="${project.build.dir}/classes" />
     
     <property name="defaults.wget.path" location="/usr/local/bin/wget" />
@@ -100,37 +103,25 @@
         </sequential>
     </macrodef>
     
-   <macrodef name="azul.clean-all">
+    <macrodef name="azul.clean-all">
       <sequential>
-        <delete dir="${build.dir}" includes="**/*" includeemptydirs="true" />
-        <delete dir="${repository.dir}" includes="**/*" includeemptydirs="true" />
+        <delete dir="${project.build.dir}" includes="**/*" includeemptydirs="true" />
       </sequential>
     </macrodef>
-
-    <macrodef name="azul.install-dependency">
-        <attribute name="project" default="dne" />
-        <attribute name="project.build.dir" default="${build.project.dir}/../@{project}" />
-        
-        <sequential>
-            <echo message="[ant.install-dependency] project=@{project} target=install" />
-            
-            <ant antfile="@{project.build.dir}/build.xml" target="install" inheritall="false">
-               <property name="build.project.dir" location="${build.project.dir}" />
-               <property name="repository.dir" location="${repository.dir}" />
-            </ant>
-        </sequential>
-    </macrodef>
+	
+    <!--
+  	<delete dir="${lib.dir}" includes="**/*" includeemptydirs="true" />
+    <delete dir="${extlib.dir}" includes="**/*" includeemptydirs="true" />
+	-->
     
     <!-- project-clean -->
     <macrodef name="azul.clean">
       <sequential>
-        <delete dir="${project.repository.dir}" includes="**/*"
-          includeemptydirs="true"
-          failonerror="false" />
-        
         <delete dir="${project.build.dir}" includes="**/*"
           includeemptydirs="true"
           failonerror="false" />
+      	
+      	<delete file="${project.build.dir}" />
       </sequential>
     </macrodef>
 
@@ -158,8 +149,9 @@
       <element name="classpath-contents" implicit="true" optional="true" />
 
       <sequential>
-        <mkdir dir="@{destdir}" />
-
+      	<!-- <echo message="srcdir: @{srcdir} destdir: @{destdir}" /> -->
+      	<mkdir dir="@{destdir}" />
+      	
         <azul.depend srcdir="@{srcdir}" destdir="@{destdir}">
           <classpath-contents />
         </azul.depend>
@@ -337,8 +329,34 @@
         </exec>
       </sequential>
     </macrodef>
+    
+    <macrodef name="azul.install">
+      <attribute name="jar" default="${project.name}.jar" />
+      <attribute name="file" default="${project.build.dir}/@{jar}" />
+        
+      <attribute name="todir" default="${install.dir}" />
+        
+      <sequential>
+          <!-- really should be parent of file -->
+          <mkdir dir="${repository.dir}" />
+            
+          <copy file="@{file}" todir="@{todir}" />
+      </sequential>
+    </macrodef>
 
     <macrodef name="azul.install-libs">
+      <attribute name="libdir" default="${project.lib.dir}" />
+      <attribute name="includes" default="*.jar" />
+      <attribute name="todir" default="${install.dir}" />
+      
+      <sequential>
+        <copy todir="@{todir}">
+          <fileset dir="@{libdir}" includes="@{includes}" />
+        </copy>
+      </sequential>
+    </macrodef>
+	
+    <macrodef name="azul.ext-libs">
       <attribute name="libdir" default="${project.repository.dir}" />
       <attribute name="includes" default="*.jar" />
       <attribute name="todir" default="${repository.dir}" />
@@ -349,18 +367,102 @@
         </copy>
       </sequential>
     </macrodef>
-    
-    <macrodef name="azul.install">
-      <attribute name="jar" default="${project.name}.jar" />
-      <attribute name="file" default="${project.build.dir}/@{jar}" />
-        
-      <attribute name="todir" default="${repository.dir}" />
-        
+	
+
+	
+    <macrodef name="azul.ant">
+      <attribute name="project" default="dne" />
+      <attribute name="project.dir" default="${projects.dir}/@{project}" />
+      <attribute name="target" />
+    	
+      <element name="properties" implicit="true" />
+    	
       <sequential>
-          <!-- really should be parent of file -->
-          <mkdir dir="${repository.dir}" />
+        <echo message="[azul.ant] project=@{project} target=@{target}" />
+      	<!-- <echo message=" - project.dir=@{project.dir}" /> -->
             
-          <copy file="@{file}" todir="@{todir}" />
+        <ant dir="@{project.dir}" antfile="@{project.dir}/build.xml"
+          target="@{target}"
+      	  inheritall="false">
+        	
+          <properties />
+        </ant>
       </sequential>
     </macrodef>
+	
+	<macrodef name="azul.project-clean">
+	  <attribute name="project" default="dne" />
+	  <attribute name="project.dir" default="${projects.dir}/@{project}" />
+	  
+	  <sequential>
+	     <azul.ant project="@{project}" target="clean">
+	       <property name="project.dir" value="@{project.dir}" />
+	       <property name="repository.dir" value="${repository.dir}" />
+	  	 </azul.ant>
+	  </sequential>
+    </macrodef>
+	
+	<macrodef name="azul.project-prepare">
+	  <attribute name="project" default="dne" />
+	  <attribute name="project.dir" default="${projects.dir}/@{project}" />
+	  
+	  <sequential>
+	     <azul.ant project="@{project}" target="prepare">
+	       <property name="project.dir" value="@{project.dir}" />
+	       <property name="repository.dir" value="${repository.dir}" />
+	  	 </azul.ant>
+	  </sequential>
+    </macrodef>
+	
+	<macrodef name="azul.project-compile">
+	  <attribute name="project" default="dne" />
+	  <attribute name="project.dir" default="${projects.dir}/@{project}" />
+	  
+	  <sequential>
+	     <azul.ant project="@{project}" target="compile">
+	       <property name="project.dir" value="@{project.dir}" />
+	       <property name="repository.dir" value="${repository.dir}" />
+	  	 </azul.ant>
+	  </sequential>
+    </macrodef>
+	
+	<macrodef name="azul.project-package">
+	  <attribute name="project" default="dne" />
+	  <attribute name="projectdir" default="${projects.dir}/@{project}" />
+	  
+	  <sequential>
+	     <azul.ant project="@{project}" target="package">
+	       <property name="projectdir" value="@{projectdir}" />
+	       <property name="repository.dir" value="${repository.dir}" />
+	  	 </azul.ant>
+	  </sequential>
+    </macrodef>
+	
+	<macrodef name="azul.project-install">
+	  <attribute name="project" default="dne" />
+	  <attribute name="projectdir" default="${projects.dir}/@{project}" />
+	  <attribute name="todir" default="${repository.dir}" />
+	  
+	  <sequential>
+	     <azul.ant project="@{project}" target="compile">
+	       <property name="project.dir" value="@{projectdir}" />
+	       <property name="repository.dir" value="${repository.dir}" />
+	     	
+	       <property name="install.dir" value="@{todir}" />
+	  	 </azul.ant>
+	  </sequential>
+    </macrodef>
+	
+	<macrodef name="azul.project-install-lib">
+	  <attribute name="project" default="dne" />
+	  <attribute name="projectdir" default="${projects.dir}/@{project}" />
+	  <attribute name="libdir" default="${project.lib.dir}" />
+	  
+	  <sequential>
+	  	<azul.project-install
+	  	  project="@{project}"
+	  	  projectdir="@{projectdir}"
+	  	  todir="@{libdir}" />
+	  </sequential>
+	</macrodef>
 </project>

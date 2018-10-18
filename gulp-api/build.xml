@@ -1,5 +1,5 @@
-<project name="gulp-api" basedir="." default="install">
-  <property name="build.project.dir" location="../azul-build" />
+<project name="gulp-api" basedir="." default="package">
+  <property name="build.project.dir" location=".." />
   <import file="${build.project.dir}/azul-build-macros.xml" />
 
   <target name="clean">

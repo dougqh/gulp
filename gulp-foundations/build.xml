@@ -1,21 +1,18 @@
-<project name="gulp-foundations" basedir="." default="install">
-  <property name="build.project.dir" location="../azul-build" />
-  <import file="${build.project.dir}/azul-build-macros.xml" />
+<project name="gulp-foundations" basedir="." default="package">
+  <import file="../azul-build-macros.xml" />
 
   <target name="clean">
     <azul.clean />
   </target>
 
   <target name="prepare">
-    <!-- nop -->
+    <azul.project-install-lib project="gulp-nexus" />
   </target>
 
   <target name="compile" depends="prepare">
-    <azul.install-dependency project="gulp-nexus" />
-           
     <azul.compile>
       <classpath>
-        <pathelement location="${repository.dir}/gulp-nexus.jar" />
+        <pathelement location="${project.lib.dir}/gulp-nexus.jar" />
        </classpath>
      </azul.compile>
   </target>
@@ -29,6 +26,8 @@
   </target>
   
   <target name="install" depends="package">
+  	<azul.install-libs />
+  	
     <azul.install />
   </target>
 </project>

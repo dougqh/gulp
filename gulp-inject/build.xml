@@ -1,5 +1,5 @@
-<project name="gulp-inject" basedir="." default="install">
-  <property name="build.project.dir" location="../azul-build" />
+<project name="gulp-inject" basedir="." default="package">
+  <property name="build.project.dir" location=".." />
   <import file="${build.project.dir}/azul-build-macros.xml" />
 
   <target name="clean">
@@ -7,14 +7,12 @@
   </target>
 
   <target name="prepare">
-    <!-- nop -->
+  	<azul.project-install-lib project="gulp-api" />
   </target>
 
   <target name="compile" depends="prepare">
- 	<azul.install-dependency project="gulp-api" />
-
-    <azul.compile>
-       <classpath location="${repository.dir}/gulp-api.jar" />
+ 	<azul.compile>
+      <classpath location="${project.lib.dir}/gulp-api.jar" />
     </azul.compile>
   </target>
     
@@ -27,6 +25,8 @@
   </target>
   
   <target name="install" depends="package">
+  	<azul.install-libs />
+  	
     <azul.install />
   </target>
 </project>

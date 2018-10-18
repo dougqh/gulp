@@ -1,7 +1,7 @@
 .DS_Store
-build/*
-central-repo/*
-project-repos/*
+.repo/*
+*/build/*
+*/lib/*
+*/ext-lib/*
 *.class
-.metadata/*
-
+*.jar

@@ -1,17 +1,19 @@
-<project name="gulp-text" basedir="." default="install">
-  <property name="build.project.dir" location="../azul-build" />
+<project name="gulp-text" basedir="." default="package">
+  <property name="build.project.dir" location=".." />
   <import file="${build.project.dir}/azul-build-macros.xml" />
 
+  <target name="prepare">
+    <azul.project-install-lib project="gulp-core" />
+  </target>
+  	
   <target name="clean">
     <azul.clean />
   </target>
     
   <target name="compile">
-    <azul.install-dependency project="gulp-foundations" />
-           
     <azul.compile>
       <classpath>
-         <pathelement location="${repository.dir}/gulp-foundations.jar" />
+         <pathelement location="${project.lib.dir}/gulp-core.jar" />
        </classpath>
      </azul.compile>
   </target>
@@ -19,12 +21,14 @@
   <target name="package" depends="compile">
     <azul.jar>
       <manifest>
-          <attribute name="Class-Path" value="./gulp-foundations.jar" />
+        <attribute name="Class-Path" value="./gulp-core.jar" />
       </manifest>
     </azul.jar>
   </target>
   
   <target name="install" depends="package">
+  	<azul.install-libs />
+  	
     <azul.install />
   </target>
 </project>
