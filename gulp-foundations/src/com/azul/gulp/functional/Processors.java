@@ -6,7 +6,6 @@ import java.util.Map;
 import com.azul.gulp.Predicate;
 import com.azul.gulp.Processor;
 import com.azul.gulp.ThrowingFunction;
-import com.azul.gulp.functional.inject.InjectionAwareItemCaptureProcessor;
 import com.azul.gulp.functional.inject.InjectionAwareProcessor;
 import com.azul.gulp.inject.InjectionContext;
 
