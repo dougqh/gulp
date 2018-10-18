@@ -1,6 +1,6 @@
 package com.azul.gulp.text;
 
-// @FunctionalInterface
+@FunctionalInterface
 public interface LineNormalizer {
   public abstract String normalize(final String line) throws Exception;
 }
