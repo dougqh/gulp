@@ -3,3 +3,5 @@ build/*
 central-repo/*
 project-repos/*
 *.class
+.metadata/*
+
