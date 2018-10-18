@@ -1,0 +1,36 @@
+<project name="gulp-nexus" basedir="." default="install">
+  <property name="build.project.dir" location="../azul-build" />
+  <import file="${build.project.dir}/azul-build-macros.xml" />
+
+  <target name="clean">
+    <azul.clean />
+  </target>
+  
+  <target name="prepare">
+    <!-- nop -->
+  </target>
+    
+  <target name="compile" depends="prepare">
+  	<azul.install-dependency project="gulp-api" />
+    <azul.install-dependency project="gulp-inject" />
+
+    <azul.compile>
+      <classpath>
+      	<pathelement location="${repository.dir}/gulp-api.jar" />
+        <pathelement location="${repository.dir}/gulp-inject.jar" />
+      </classpath>
+    </azul.compile>
+  </target>
+    
+  <target name="package" depends="compile">
+    <azul.jar>
+      <manifest>
+      	<attribute name="Class-Path" value="./gulp-api.jar ./gulp-inject.jar" />
+      </manifest>
+    </azul.jar>
+  </target>
+  
+  <target name="install" depends="package">
+    <azul.install />
+  </target>
+</project>
