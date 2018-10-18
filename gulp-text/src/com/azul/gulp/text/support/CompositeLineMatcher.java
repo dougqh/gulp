@@ -1,0 +1,39 @@
+package com.azul.gulp.text.support;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.azul.gulp.Emitter;
+import com.azul.gulp.inject.InjectionAware;
+import com.azul.gulp.inject.InjectionContext;
+import com.azul.gulp.text.Line;
+import com.azul.gulp.text.LineMatcher;
+
+public final class CompositeLineMatcher<T> implements LineMatcher<T>, InjectionAware {
+  private final List<? extends LineMatcher<T>> matchers;
+  
+  @SafeVarargs
+  public CompositeLineMatcher(final LineMatcher<T>... matchers) {
+    this(Arrays.asList(matchers));
+  }
+  
+  public CompositeLineMatcher(final List<? extends LineMatcher<T>> matchers) {
+    this.matchers = matchers;
+  }
+  
+  @Override
+  public final void onInject(final InjectionContext ctx) {
+    for ( LineMatcher<T> matcher: this.matchers ) {
+      ctx.inject(matcher);
+    }
+  }
+  
+  @Override
+  public final void process(final Line line, final Emitter<T> emitter)
+    throws Exception
+  {
+    for ( LineMatcher<T> matcher: this.matchers ) {
+      matcher.process(line, emitter);
+    }
+  }
+}
