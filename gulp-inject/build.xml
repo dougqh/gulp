@@ -1,6 +1,5 @@
 <project name="gulp-inject" basedir="." default="package">
-  <property name="build.project.dir" location=".." />
-  <import file="${build.project.dir}/azul-build-macros.xml" />
+  <import file="../azul-build-macros.xml" />
 
   <target name="clean">
     <azul.clean />
@@ -17,6 +16,8 @@
   </target>
     
   <target name="package" depends="compile">
+  	<azul.package-libs />
+  	
     <azul.jar>
       <manifest>
       	<attribute name="Class-Path" value="./gulp-api.jar" />

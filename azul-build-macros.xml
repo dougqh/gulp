@@ -3,6 +3,8 @@
         <fail message="zz-unrunnable"/>
     </target>
 
+	<property name="defaults.verbose" value="false" />
+	
 	<property name="projects.dir" location=".." />
     <property name="project.dir" location="${basedir}" />
     <property name="project.name" value="${ant.project.name}" />
@@ -17,14 +19,19 @@
     <property name="src.dir" location="${project.dir}/src" />
     <property name="project.build.dir" location="${project.dir}/build" />
     <property name="class.dir" location="${project.build.dir}/classes" />
-    
-    <property name="defaults.wget.path" location="/usr/local/bin/wget" />
-
+    	
     <!-- http://central.maven.org/maven2/org/apache/poi/poi-scratchpad/3.15/poi-scratchpad-3.15.jar -->    
     <property name="defaults.maven.url.base" value="http://central.maven.org/maven2" />
-    <property name="defaults.http.usecaches" value="true" />
-    <property name="defaults.http.useresponsecode" value="true" />
-    <property name="defaults.http.usetimestamp" value="true" />
+
+    <property name="defaults.get-extlib.usecaches" value="true" />
+	<property name="defaults.get-extlib.retries" value="3" />
+	<property name="defaults.get-extlib.maxtimesecs" value="0" /> 
+    <property name="defaults.get-extlib.skipexisting" value="true" />
+    <property name="defaults.get-extlib.trygzip" value="false" />
+	<property name="defaults.get-extlib.usetimetamp" value="true" />
+	<property name="defaults.get-extlib.verbose" value="false" />
+	
+	<echo message="project: ${project.name} - project.dir: ${project.dir} projects.dir: ${projects.dir}" />
     
     <property name="defaults.jdkrefid" value="defaultjdk" />
 
@@ -289,44 +296,58 @@
       </sequential>
     </macrodef>
 
+	
+	<macrodef name="azul.def-extlib">
+	  <attribute name="id" />
+	  <attribute name="groupId" />
+	  <attribute name="artifactId" />
+	  <attribute name="version" />
+	  	
+	  <sequential>
+	  	<property name="@{id}-groupId" value="@{groupId}" />
+	  	<property name="@{id}-artifactId" value="@{artifactId}" />
+	  	<property name="@{id}-version" value="@{version}" />
+	  	
+	  	<property name="@{id}-jar" value="@{artifactId}-@{version}.jar" />
+	  </sequential>
+	</macrodef>
+	
     <!-- https://search.maven.org/remotecontent?filepath=org/apache/poi/poi-scratchpad/4.0.0/poi-scratchpad-4.0.0.jar -->
-    <macrodef name="azul.get-maven-lib">
-      <attribute name="groupId" />
-      <attribute name="artifactId" />
-      <attribute name="version" />
+    <macrodef name="azul.get-extlib">
+      <attribute name="refid" />
+      <attribute name="groupId" default="${@{refid}-groupId}"/>
+      <attribute name="artifactId" default="${@{refid}-artifactId}" />
+      <attribute name="version" default="${@{refid}-version}" />
       
       <attribute name="repourl" default="${defaults.maven.url.base}" />
       <attribute name="path" default="@{groupId}/@{artifactId}/@{version}/@{artifactId}-@{version}.jar" />
-	
-      <attribute name="destdir" default="${project.repository.dir}" />
-      <attribute name="destfile" default="@{destdir}/@{artifactId}-@{version}.jar" />
+	  <attribute name="url" default="@{repourl}/@{path}" />
+    	
+      <attribute name="destdir" default="${project.extlib.dir}" />
+      <attribute name="destfile" default="@{destdir}/${@{refid}-jar}" />
 
-      <attribute name="usecaches" default="${defaults.http.usecaches}" />
-      <attribute name="useresponsecode" default="${defaults.http.usecaches}" />
-      <attribute name="usetimestamp" default="${defaults.get.usetimestamp}" />
+      <attribute name="retries" default="${defaults.get-extlib.retries}" />
+      <attribute name="maxtime" default="${defaults.get-extlib.maxtimesecs}" />
+      <attribute name="maxtimesecs" default="@{maxtime}" />
+    	
+      <attribute name="usecaches" default="${defaults.get-extlib.usecaches}" />
+      <attribute name="skipexisting" default="${defaults.get-extlib.skipexisting}" />
+      <attribute name="usetimestamp" default="${defaults.get-extlib.usetimestamp}" />
+      <attribute name="trygzip" default="${defaults.get-extlib.tryzip}" />
+    	
+      <attribute name="verbose" default="${defaults.get-extlib.verbose}" />
+    	
       <sequential>
         <mkdir dir="@{destdir}" />
-
-      	<!-- intended for Ant http add-on 
-        <http url="@{repourl}/@{path}" destfile="@{destfile}"
-          usecaches="@{usecaches}"
-          useresponsecode="@{useresponsecode}"
-      	  usetimestamp="@{usetimestamp}">
-          <param name="filepath" value="@{filepath}" />
-        </http>
-        -->
-
-      	<!-- wget -O {destfile} {url} -->
-      	<!-- DQH: spawn="true" does not work - at least on Mac -->
-        <exec dir="@{destdir}" resolveexecutable="true"
-          executable="${defaults.wget.path}"
-          newenvironment="false"
-          failifexecutionfails="false"
-          failonerror="false">
-          <arg value="--no-clobber" />
-          <arg value="-O" /><arg value="@{destfile}" />
-          <arg value="@{repourl}/@{path}" />
-        </exec>
+      	
+      	<get src="@{url}" dest="@{destfile}"
+      	  usetimestamp="@{usetimestamp}"
+      	  maxtime="@{maxtimesecs}"
+      	  retries="@{retries}"
+      	  skipexisting="@{skipexisting}"
+      	  httpusecaches="@{usecaches}"
+      	  trygzipencoding="@{trygzip}"
+      	  verbose="@{verbose}" />
       </sequential>
     </macrodef>
     
@@ -344,8 +365,52 @@
       </sequential>
     </macrodef>
 
+    <macrodef name="azul.copy-libs">
+      <attribute name="libdir" default="${project.lib.dir}" />
+      <attribute name="includes" default="*.jar" />
+      <attribute name="todir" />
+      
+      <sequential>
+        <copy todir="@{todir}">
+          <fileset dir="@{libdir}" includes="@{includes}" />
+        </copy>
+      </sequential>
+    </macrodef>
+	
     <macrodef name="azul.install-libs">
       <attribute name="libdir" default="${project.lib.dir}" />
+      <attribute name="includes" default="*.jar" />
+      <attribute name="todir" default="${install.dir}" />
+      
+      <sequential>
+        <azul.copy-libs libdir="@{libdir}" includes="@{includes}" todir="@{todir}" />
+      </sequential>
+    </macrodef>
+
+    <macrodef name="azul.package-libs">
+      <attribute name="libdir" default="${project.lib.dir}" />
+      <attribute name="includes" default="*.jar" />
+      <attribute name="todir" default="${project.build.dir}" />
+      
+      <sequential>
+        <azul.copy-libs libdir="@{libdir}" includes="@{includes}" todir="@{todir}" />
+      </sequential>
+    </macrodef>
+    
+    <macrodef name="azul.copy-extlibs">
+      <attribute name="libdir" default="${project.extlib.dir}" />
+      <attribute name="includes" default="*.jar" />
+      <attribute name="todir" />
+      
+      <sequential>
+        <copy todir="@{todir}">
+          <fileset dir="@{libdir}" includes="@{includes}" />
+        </copy>
+      </sequential>
+    </macrodef>
+	
+    <macrodef name="azul.install-extlibs">
+      <attribute name="libdir" default="${project.extlib.dir}" />
       <attribute name="includes" default="*.jar" />
       <attribute name="todir" default="${install.dir}" />
       
@@ -356,10 +421,10 @@
       </sequential>
     </macrodef>
 	
-    <macrodef name="azul.ext-libs">
-      <attribute name="libdir" default="${project.repository.dir}" />
+    <macrodef name="azul.package-extlibs">
+      <attribute name="libdir" default="${project.extlib.dir}" />
       <attribute name="includes" default="*.jar" />
-      <attribute name="todir" default="${repository.dir}" />
+      <attribute name="todir" default="${build.project.dir}" />
       
       <sequential>
         <copy todir="@{todir}">
@@ -367,8 +432,6 @@
         </copy>
       </sequential>
     </macrodef>
-	
-
 	
     <macrodef name="azul.ant">
       <attribute name="project" default="dne" />
@@ -432,7 +495,7 @@
 	  
 	  <sequential>
 	     <azul.ant project="@{project}" target="package">
-	       <property name="projectdir" value="@{projectdir}" />
+	       <property name="project.dir" value="@{projectdir}" />
 	       <property name="repository.dir" value="${repository.dir}" />
 	  	 </azul.ant>
 	  </sequential>
@@ -444,7 +507,7 @@
 	  <attribute name="todir" default="${repository.dir}" />
 	  
 	  <sequential>
-	     <azul.ant project="@{project}" target="compile">
+	     <azul.ant project="@{project}" target="install">
 	       <property name="project.dir" value="@{projectdir}" />
 	       <property name="repository.dir" value="${repository.dir}" />
 	     	

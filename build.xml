@@ -1,5 +1,6 @@
 <project name="gulp" basedir="." default="package">
   <property name="projects.dir" location="." />
+  <property name="project.dir" location="." />
   <import file="./azul-build-macros.xml" />
 
   <target name="clean">

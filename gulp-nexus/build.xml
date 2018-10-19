@@ -1,6 +1,5 @@
 <project name="gulp-nexus" basedir="." default="package">
-  <property name="build.project.dir" location=".." />
-  <import file="${build.project.dir}/azul-build-macros.xml" />
+  <import file="../azul-build-macros.xml" />
 
   <target name="clean">
     <azul.clean />

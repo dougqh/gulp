@@ -19,6 +19,8 @@
   </target>
     
   <target name="package" depends="compile">
+  	<azul.package-libs />
+  	
     <azul.jar>
       <manifest>
         <attribute name="Class-Path" value="./gulp-core.jar" />
