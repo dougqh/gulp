@@ -1,0 +1,43 @@
+<project name="gulp-tables" basedir="." default="install">
+  <import file="../azul-build-macros.xml" />
+
+  <azul.def-extlib id="commons-csv"
+  	groupId="org/apache/commons"
+	artifactId="commons-csv"
+	version="1.4" />
+	
+  <target name="clean">
+    <azul.clean />
+  </target>
+
+  <target name="prepare">
+    <azul.get-extlib refid="commons-csv" />
+  	
+  	<azul.project-install-lib project="gulp-core" />
+  </target>
+
+  <target name="compile" depends="prepare">
+    <azul.compile>
+     <classpath>
+       <pathelement location="${project.lib.dir}/gulp-core.jar" />
+       <pathelement location="${project.extlib.dir}/${commons-csv-jar}" />
+     </classpath>
+    </azul.compile>
+  </target>
+    
+  <target name="package" depends="compile">
+  	<azul.package-extlibs />
+  	
+    <azul.jar>
+      <manifest>
+      	<attribute name="Class-Path" value="./${commons-csv-jar}" />
+      </manifest>
+    </azul.jar>
+  </target>
+  
+  <target name="install" depends="package">
+    <azul.install-extlibs />
+
+    <azul.install />
+  </target>
+</project>
