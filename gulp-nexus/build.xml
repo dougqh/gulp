@@ -22,7 +22,7 @@
   <target name="package" depends="compile">
     <azul.jar>
       <manifest>
-      	<attribute name="Class-Path" value="./gulp-api.jar ./gulp-inject.jar" />
+      	<attribute name="Class-Path" value="gulp-api.jar gulp-inject.jar" />
       </manifest>
     </azul.jar>
   </target>

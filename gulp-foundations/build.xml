@@ -22,7 +22,7 @@
   	
     <azul.jar>
       <manifest>
-        <attribute name="Class-Path" value="./gulp-nexus.jar" />
+        <attribute name="Class-Path" value="gulp-nexus.jar" />
       </manifest>
     </azul.jar>
   </target>

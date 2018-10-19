@@ -1,0 +1,93 @@
+<project name="gulp-excel" basedir="." default="install">
+  <import file="../azul-build-macros.xml" />
+	
+  <azul.def-extlib id="commons-codec"
+    groupId="commons-codec"
+	artifactId="commons-codec"
+	version="1.10" />
+	
+  <azul.def-extlib id="commons-collections"
+	groupId="org/apache/commons"
+	artifactId="commons-collections4"
+	version="4.0" />
+
+  <property name="poi.version" value="3.15" />
+
+  <azul.def-extlib id="poi"
+	groupId="org/apache/poi" 
+  	artifactId="poi" 
+  	version="${poi.version}" />
+
+  <azul.def-extlib id="poi-ooxml"
+	groupId="org/apache/poi"
+	artifactId="poi-ooxml"
+	version="${poi.version}" />
+	
+  <azul.def-extlib id="poi-ooxml-schemas"
+  	groupId="org/apache/poi"
+	artifactId="poi-ooxml-schemas"
+	version="${poi.version}" />
+	
+  <azul.def-extlib id="poi-scratchpad"
+  	groupId="org/apache/poi"
+  	artifactId="poi-scratchpad"
+	version="${poi.version}" />
+	
+  <azul.def-extlib id="xmlbeans"
+	groupId="org/apache/xmlbeans"
+	artifactId="xmlbeans"
+	version="2.6.0" />
+	
+  <azul.def-extlib id="commons-logging"
+	groupId="commons-logging"
+	artifactId="commons-logging"
+	version="1.2" />
+
+  <target name="clean">
+    <azul.clean />
+  </target>
+ 
+  <target name="prepare">
+  	<azul.project-install-lib project="gulp-tables" />
+  	
+    <azul.get-extlib refid="poi" />
+    <azul.get-extlib refid="poi-ooxml" />
+    <azul.get-extlib refid="poi-ooxml-schemas" />
+  	<azul.get-extlib refid="poi-scratchpad" />
+  	
+  	<!-- indirect deps -->
+    <azul.get-extlib refid="commons-codec" />
+    <azul.get-extlib refid="commons-collections" />
+
+ 	<azul.get-extlib refid="xmlbeans" />
+    <azul.get-extlib refid="commons-logging" />
+  </target>
+
+  <target name="compile" depends="prepare">
+    <azul.compile>
+     <classpath>
+       <fileset dir="${project.lib.dir}" includes="*.jar" />
+       <fileset dir="${project.extlib.dir}" includes="*.jar"/>
+     </classpath>
+    </azul.compile>
+  </target>
+    
+  <target name="package" depends="compile">
+  	<azul.package-libs />
+  	<azul.package-extlibs />
+  	
+    <azul.jar>
+      <manifest>
+      	<attribute name="Class-Path"
+      	  value="gulp-tables.jar ${poi-jar} ${poi-ooxml-jar} ${poi-ooxml-schemas-jar} ${poi-scratchpad-jar} ${commons-codec-jar} ${xmlbeans-jar} ${commons-logging-jar}" />
+      </manifest>
+    </azul.jar>
+  </target>
+  
+  <target name="install" depends="package">
+  	<azul.install-libs />
+  	<azul.install-extlibs />
+  	
+  	<azul.install />
+  </target>
+</project>

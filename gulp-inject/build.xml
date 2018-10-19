@@ -20,7 +20,7 @@
   	
     <azul.jar>
       <manifest>
-      	<attribute name="Class-Path" value="./gulp-api.jar" />
+      	<attribute name="Class-Path" value="gulp-api.jar" />
       </manifest>
     </azul.jar>
   </target>

@@ -424,7 +424,7 @@
     <macrodef name="azul.package-extlibs">
       <attribute name="libdir" default="${project.extlib.dir}" />
       <attribute name="includes" default="*.jar" />
-      <attribute name="todir" default="${build.project.dir}" />
+      <attribute name="todir" default="${project.build.dir}" />
       
       <sequential>
         <copy todir="@{todir}">

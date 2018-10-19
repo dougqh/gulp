@@ -26,6 +26,7 @@
   </target>
     
   <target name="package" depends="compile">
+  	<azul.install-libs />
   	<azul.package-extlibs />
   	
     <azul.jar>
@@ -36,6 +37,7 @@
   </target>
   
   <target name="install" depends="package">
+  	<azul.install-libs />
     <azul.install-extlibs />
 
     <azul.install />
