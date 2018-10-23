@@ -1,4 +1,4 @@
-<project name="gulp-inject" basedir="." default="package">
+<project name="gulp-meta" basedir="." default="package">
   <import file="../azul-build-macros.xml" />
 
   <target name="clean">

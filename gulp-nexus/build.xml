@@ -7,14 +7,14 @@
   
   <target name="prepare">
   	<azul.project-install-lib project="gulp-api" />
-    <azul.project-install-lib project="gulp-inject" />
+    <azul.project-install-lib project="gulp-meta" />
   </target>
     
   <target name="compile" depends="prepare">
     <azul.compile>
       <classpath>
       	<pathelement location="${project.lib.dir}/gulp-api.jar" />
-        <pathelement location="${project.lib.dir}/gulp-inject.jar" />
+        <pathelement location="${project.lib.dir}/gulp-meta.jar" />
       </classpath>
     </azul.compile>
   </target>
@@ -22,7 +22,7 @@
   <target name="package" depends="compile">
     <azul.jar>
       <manifest>
-      	<attribute name="Class-Path" value="gulp-api.jar gulp-inject.jar" />
+      	<attribute name="Class-Path" value="gulp-api.jar gulp-meta.jar" />
       </manifest>
     </azul.jar>
   </target>

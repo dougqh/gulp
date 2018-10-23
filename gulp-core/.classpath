@@ -3,7 +3,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/gulp-api"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/gulp-foundations"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/gulp-inject"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/gulp-meta"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/gulp-nexus"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
