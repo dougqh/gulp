@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 public final class BasicAnnotationFinder implements AnnotationFinder {
+  public static final AnnotationFinder INSTANCE = new BasicAnnotationFinder();	
+
+  private BasicAnnotationFinder() {}
+  
   public final <A extends Annotation> List<A> findFor(Class<?> klass, Class<A> annoKlass) {
 	return toList(klass.getAnnotation(annoKlass));
   }
