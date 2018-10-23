@@ -1,5 +1,6 @@
 package com.azul.gulp.tables;
 
+import com.azul.gulp.nexus.Nexus;
 import com.azul.gulp.sources.Converter;
 import com.azul.gulp.sources.Source;
 
@@ -10,7 +11,10 @@ public abstract class GulpRowSource extends Source<GulpRow> {
   }
   
   @Override
-  public final <V> Converter<GulpRow, V> converterFor(final Class<V> type) {
+  public final <V> Converter<GulpRow, V> converterFor(
+	final Nexus nexus,
+	final Class<V> type)
+  {
     return new GulpRowConverter<V>(type);
   }
 }
