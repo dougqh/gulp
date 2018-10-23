@@ -1,5 +1,6 @@
 package com.azul.gulp.nexus;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -34,6 +35,14 @@ public final class NexusImpl implements Nexus {
   {
     this.availableTypes.addAll(coreTypes);
     this.plugins = new CompositePlugin(plugins);
+  }
+  
+  @Override
+  public <A extends Annotation> List<A> findAnnotationsFor(
+	Class<?> klass,
+	Class<A> annoKlass)
+  {
+	return this.get(AnnotationFinder.class).findAnnotationsFor(klass, annoKlass);
   }
   
   public final void inject(final Object obj) {

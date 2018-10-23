@@ -4,5 +4,5 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 public interface AnnotationFinder {
-  <A extends Annotation> List<A> findFor(Class<?> klass, Class<A> annoKlass);
+  <A extends Annotation> List<A> findAnnotationsFor(Class<?> klass, Class<A> annoKlass);
 }

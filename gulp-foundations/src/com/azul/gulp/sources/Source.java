@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.azul.gulp.LogProcessingException;
 import com.azul.gulp.Processor;
+import com.azul.gulp.nexus.Nexus;
 
 public abstract class Source<T> {
   volatile List<T> prefetched = null;
@@ -29,7 +30,7 @@ public abstract class Source<T> {
   
   protected abstract void forEachImpl(final Processor<? super T> processor) throws Exception;
   
-  public abstract <V> Converter<T, V> converterFor(final Class<V> type);
+  public abstract <V> Converter<T, V> converterFor(final Nexus nexus, final Class<V> type);
   
   void prefetch() throws Exception {
     List<T> prefetched = this.prefetched;

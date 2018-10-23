@@ -95,26 +95,26 @@ public class SourceBasedGulpLog<C extends GulpLogExtension<C>, S> extends GulpLo
     
     @Override
     public <V> boolean handleEventRequest(
-      final Nexus engine,
+      final Nexus nexus,
       final Class<V> requiredType)
       throws Exception
     {
       Class<T> coreType = this.source.coreType();
       
-      final Converter<T, V> converter = this.source.converterFor(requiredType);
+      final Converter<T, V> converter = this.source.converterFor(nexus, requiredType);
       if ( converter == null ) return false;
       
-      engine.handle(coreType, new NexusHandler<T>() {
+      nexus.handle(coreType, new NexusHandler<T>() {
         private NexusHandledMarker<T> marker;
         private Emitter<V> emitter;
         
         @Override
-        public void init(final Nexus engine) throws Exception {
-          converter.init(engine);
+        public void init(final Nexus nexus) throws Exception {
+          converter.init(nexus);
 
-          this.marker = engine.getMarker(coreType);
+          this.marker = nexus.getMarker(coreType);
           
-          NexusEmitter<V> nexusEmitter = engine.getEmitter(requiredType);
+          NexusEmitter<V> nexusEmitter = nexus.getEmitter(requiredType);
           this.emitter = nexusEmitter::fire;
         }
         

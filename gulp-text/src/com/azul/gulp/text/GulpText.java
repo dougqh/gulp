@@ -8,6 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.azul.gulp.text.support.AnnotatedRegexLineMatcher;
 import com.azul.gulp.text.support.CompositeLineMatcher;
@@ -45,32 +47,33 @@ public final class GulpText {
   }
   
   
+  static final <T> com.azul.gulp.text.LineMatcher<T> makeMatcherFrom(
+    final Class<T> dataClass,
+    final List<GulpText.LineMatchers> annoList)
+  {
+	List<com.azul.gulp.text.LineMatcher<T>> matchers = new ArrayList<>();
+	
+	for ( GulpText.LineMatchers matchersAnno: annoList ) {
+	  for ( GulpText.LineMatcher matcherAnno: matchersAnno.value() ) {
+	    matchers.add(GulpText.makeMatcherFrom(dataClass, matcherAnno));
+	  }
+	}
+	
+    return new CompositeLineMatcher<T>(matchers);
+  }
   
   // TODO: lower visibility
-  public static final boolean isRegexBased(final GulpText.LineMatcher anno) {
+  static final boolean isRegexBased(final GulpText.LineMatcher anno) {
     return !anno.regex().isEmpty();
   }
   
   // TODO: lower visibility
-  public static final boolean usesCustomClass(final GulpText.LineMatcher anno) {
+  static final boolean usesCustomClass(final GulpText.LineMatcher anno) {
     return !anno.value().equals(com.azul.gulp.text.LineMatcher.class);
   }
   
-  public static final <T> com.azul.gulp.text.LineMatcher<T> makeMatcherFrom(
-    final Class<T> dataClass,
-    final GulpText.LineMatchers anno)
-  {
-    GulpText.LineMatcher[] matcherAnnos = anno.value();
-    
-    @SuppressWarnings("unchecked")
-    com.azul.gulp.text.LineMatcher<T>[] matchers = new com.azul.gulp.text.LineMatcher[matcherAnnos.length];
-    for ( int i = 0; i < matcherAnnos.length; ++i ) {
-      matchers[i] = makeMatcherFrom(dataClass, matcherAnnos[i]);
-    }
-    return new CompositeLineMatcher<T>(matchers);
-  }
-  
-  public static final <T> com.azul.gulp.text.LineMatcher<T> makeMatcherFrom(
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private static final <T> com.azul.gulp.text.LineMatcher<T> makeMatcherFrom(
     final Class<T> dataClass,
     final GulpText.LineMatcher anno)
   {

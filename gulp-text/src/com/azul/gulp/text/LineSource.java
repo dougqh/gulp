@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import com.azul.gulp.Emitter;
 import com.azul.gulp.LogProcessingException;
@@ -55,23 +56,12 @@ public final class LineSource extends Source<Line> {
   }
   
   @Override
-  public <U> Converter<Line, U> converterFor(final Class<U> type) {
-    GulpText.LineMatchers lineMatchersAnno = type.getAnnotation(GulpText.LineMatchers.class);
-    GulpText.LineMatcher lineMatcherAnno = type.getAnnotation(GulpText.LineMatcher.class);
-
-    if ( lineMatchersAnno == null && lineMatcherAnno == null ) return null;
+  public <U> Converter<Line, U> converterFor(final Nexus nexus, final Class<U> type) {
+    List<GulpText.LineMatchers> lineMatchersAnnos = nexus.findAnnotationsFor(type, GulpText.LineMatchers.class);
+    if ( lineMatchersAnnos.isEmpty() ) return null;
     
-    if ( lineMatchersAnno != null ) {
-      if ( lineMatcherAnno != null ) {
-        throw new IllegalStateException("Should not specify both @LineMatchers and @LineMatcher");
-      }
-      
-      LineMatcher<U> lineMatcher = GulpText.makeMatcherFrom(type, lineMatchersAnno);
-      return new LineMatcherConverterAdapter<U>(type, lineMatcher);
-    } else {    
-      LineMatcher<U> lineMatcher = GulpText.makeMatcherFrom(type, lineMatcherAnno);
-      return new LineMatcherConverterAdapter<U>(type, lineMatcher);
-    }
+    LineMatcher<U> lineMatcher = GulpText.makeMatcherFrom(type, lineMatchersAnnos);
+    return new LineMatcherConverterAdapter<U>(type, lineMatcher);
   }
  
   @Override

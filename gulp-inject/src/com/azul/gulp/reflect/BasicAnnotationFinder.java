@@ -9,7 +9,7 @@ public final class BasicAnnotationFinder implements AnnotationFinder {
 
   private BasicAnnotationFinder() {}
   
-  public final <A extends Annotation> List<A> findFor(Class<?> klass, Class<A> annoKlass) {
+  public final <A extends Annotation> List<A> findAnnotationsFor(Class<?> klass, Class<A> annoKlass) {
 	return toList(klass.getAnnotation(annoKlass));
   }
   

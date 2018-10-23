@@ -2,8 +2,9 @@ package com.azul.gulp.nexus;
 
 import com.azul.gulp.ConfigurationException;
 import com.azul.gulp.inject.InjectionContext;
+import com.azul.gulp.reflect.AnnotationFinder;
 
-public interface Nexus extends InjectionContext {
+public interface Nexus extends InjectionContext, AnnotationFinder {
   public abstract void require(final Class<?>... types)
     throws ConfigurationException;
   
