@@ -8,6 +8,18 @@ import java.lang.annotation.Target;
 public final class Gulp {
   private Gulp() {}
   
+  // Used to annotate an event processing method on a GenericProcessor
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface Process {
+    boolean optional() default false;
+  }
+  
+  // Used to annotate an unhandled event processing method on a GenericProcessor
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface ProcessUnhandled {}
+  
   // Used to inject non-event helper objects into any non-event object
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.FIELD, ElementType.CONSTRUCTOR})
@@ -33,16 +45,6 @@ public final class Gulp {
   public @interface ForeignKey {
     public abstract Class<?> value();
   }
-  
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.METHOD)
-  public @interface Process {
-    boolean optional() default false;
-  }
-  
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.METHOD)
-  public @interface ProcessUnhandled {}
   
 //  public @interface Predicate {
 //    public abstract Class<PredicatedClass<?>> value();
