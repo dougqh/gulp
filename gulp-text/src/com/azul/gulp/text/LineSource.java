@@ -29,7 +29,7 @@ public final class LineSource extends Source<Line> {
   public LineSource(final URL url) {
     this(() -> new InputStreamReader(url.openStream()));
   }
-  
+    
   public LineSource(final IoProvider<Reader> readerProvider) {
     this(Collections.singleton(readerProvider));
   }
@@ -57,10 +57,10 @@ public final class LineSource extends Source<Line> {
   
   @Override
   public <U> Converter<Line, U> converterFor(final Nexus nexus, final Class<U> type) {
-    List<GulpText.LineMatchers> lineMatchersAnnos = nexus.findAnnotationsFor(type, GulpText.LineMatchers.class);
-    if ( lineMatchersAnnos.isEmpty() ) return null;
+    List<GulpText.LineMatcher> lineMatcherAnnos = nexus.findAnnotationsFor(type, GulpText.LineMatcher.class);
+    if ( lineMatcherAnnos.isEmpty() ) return null;
     
-    LineMatcher<U> lineMatcher = GulpText.makeMatcherFrom(type, lineMatchersAnnos);
+    LineMatcher<U> lineMatcher = GulpText.makeMatcherFrom(type, lineMatcherAnnos);
     return new LineMatcherConverterAdapter<U>(type, lineMatcher);
   }
  

@@ -1,6 +1,7 @@
 package com.azul.gulp.text;
 
 import java.io.File;
+import java.io.Reader;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Repeatable;
@@ -8,9 +9,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.azul.gulp.io.IoProvider;
 import com.azul.gulp.text.support.AnnotatedRegexLineMatcher;
 import com.azul.gulp.text.support.CompositeLineMatcher;
 
@@ -46,17 +49,22 @@ public final class GulpText {
     return new GulpTextLog(new LineSource(fileName));
   }
   
+  public static final GulpTextLog gulp(final URL url) {
+	return new GulpTextLog(new LineSource(url));
+  }
+  
+  public static final GulpTextLog gulp(final IoProvider<Reader> readerProvider) {
+	return new GulpTextLog(new LineSource(readerProvider));
+  }
   
   static final <T> com.azul.gulp.text.LineMatcher<T> makeMatcherFrom(
     final Class<T> dataClass,
-    final List<GulpText.LineMatchers> annoList)
+    final List<GulpText.LineMatcher> annoList)
   {
 	List<com.azul.gulp.text.LineMatcher<T>> matchers = new ArrayList<>();
 	
-	for ( GulpText.LineMatchers matchersAnno: annoList ) {
-	  for ( GulpText.LineMatcher matcherAnno: matchersAnno.value() ) {
-	    matchers.add(GulpText.makeMatcherFrom(dataClass, matcherAnno));
-	  }
+	for ( GulpText.LineMatcher matcherAnno: annoList ) {
+	  matchers.add(GulpText.makeMatcherFrom(dataClass, matcherAnno));
 	}
 	
     return new CompositeLineMatcher<T>(matchers);
