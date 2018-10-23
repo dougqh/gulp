@@ -3,6 +3,7 @@ package com.azul.gulp.text;
 import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -24,6 +25,7 @@ public final class GulpText {
   @Inherited
   @Target(ElementType.TYPE)
   @Retention(RetentionPolicy.RUNTIME)
+  @Repeatable(LineMatchers.class)
   public @interface LineMatcher {
     public abstract String regex() default "";
     
