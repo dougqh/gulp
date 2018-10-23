@@ -17,6 +17,8 @@ import com.azul.gulp.inject.ConstructorInjector;
 import com.azul.gulp.inject.FieldInjector;
 import com.azul.gulp.inject.InjectionAware;
 import com.azul.gulp.kernel.Kernel;
+import com.azul.gulp.reflect.AnnotationFinder;
+import com.azul.gulp.reflect.BasicAnnotationFinder;
 
 public final class NexusImpl implements Nexus {
   private final Kernel kernel = new Kernel();
@@ -269,10 +271,9 @@ public final class NexusImpl implements Nexus {
     T existingObj = (T)this.ctxObjects.get(type);
     if ( existingObj != null ) return existingObj;
 
-//    Legacy API support
-//    if ( type.equals(Dispatcher.class) ) {
-//      return (T)new CompatDispatcher(this);
-//    }
+    if ( type.equals(AnnotationFinder.class) ) {
+      return (T)BasicAnnotationFinder.INSTANCE;
+    }
     
     T newObj = this.create(type);
     this.ctxObjects.put(type, newObj);
