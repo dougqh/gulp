@@ -7,6 +7,10 @@ public final class Line {
   public final String contents;
   public final String originalContents;
   
+  public Line(final int num, final String contents) {
+    this(num, contents, contents);
+  }
+  
   public Line(final int num, final String contents, final String originalContents) {
     this.num = num;
     this.contents = contents;
@@ -177,6 +181,10 @@ public final class Line {
     
     Line that = (Line)obj;
     return (this.num == that.num) && this.contents.equals(that.contents);
+  }
+  
+  public final char[] toCharArray() {
+    return this.contents.toCharArray();
   }
   
   @Override
