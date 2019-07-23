@@ -2,7 +2,7 @@ package com.azul.gulp;
 
 import java.util.Objects;
 
-public class Range<C> {
+public class Range<C> implements Comparable<Range<C>> {
   public static final <C> Range<C> make(C start, C end) {
     return new Range<C>(start, end);
   }
@@ -55,6 +55,15 @@ public class Range<C> {
     Range<?> that = (Range<?>)obj;
     return this.start.equals(that.start) &&
       this.end.equals(that.end);
+  }
+  
+  @Override
+  public int compareTo(Range<C> that) {
+    int startComp = compare(this.start, that.start);
+    if ( startComp != 0 ) return startComp;
+    
+    int endComp = compare(this.end, that.end);
+    return endComp;
   }
   
   @Override
