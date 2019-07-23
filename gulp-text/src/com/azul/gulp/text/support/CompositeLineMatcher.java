@@ -32,8 +32,40 @@ public final class CompositeLineMatcher<T> implements LineMatcher<T>, InjectionA
   public final void process(final Line line, final Emitter<T> emitter)
     throws Exception
   {
+    final TrackingEmitter<T> trackingEmitter = new TrackingEmitter<T>(emitter);
+    final ExceptionHelper exHelper = new ExceptionHelper();
+    
     for ( LineMatcher<T> matcher: this.matchers ) {
-      matcher.process(line, emitter);
+      try {
+        matcher.process(line, emitter);
+      } catch ( Exception e ) {
+        exHelper.recordException(e);
+      }
+    }
+    
+    if ( !trackingEmitter.fired() ) exHelper.rethrow();
+  }
+  
+  static final class TrackingEmitter<T> implements Emitter<T> {
+    private final Emitter<T> wrappedEmitter;
+    private boolean fired = false;
+    
+    public TrackingEmitter(final Emitter<T> emitter) {
+      this.wrappedEmitter = emitter;
+    }
+    
+    public void reset() {
+      this.fired = false;
+    }
+    
+    @Override
+    public void fire(T value) {
+      this.wrappedEmitter.fire(value);
+      this.fired = true;
+    }
+    
+    public boolean fired() {
+      return this.fired;
     }
   }
 }

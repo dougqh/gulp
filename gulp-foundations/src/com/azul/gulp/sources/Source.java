@@ -32,7 +32,7 @@ public abstract class Source<T> {
   
   public abstract <V> Converter<T, V> converterFor(final Nexus nexus, final Class<V> type);
   
-  void prefetch() throws Exception {
+  protected void prefetch() throws Exception {
     List<T> prefetched = this.prefetched;
     if ( prefetched == null ) {
       int DEFAULT_CAPACITY = 1_000;

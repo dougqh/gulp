@@ -81,11 +81,16 @@ public class EventCapturePlugin extends Plugin {
     
     @Override
     public final void handle(final R value) throws Exception {
+      if ( value == null ) throw new IllegalArgumentException();
+      
       this.last = value;
     }
     
     @Override
     public final T normalize(T target) throws Exception {
+      T cur = (T)this.field.get(target);
+      if ( cur != null && this.last == null ) return target;
+      
       this.field.set(target, this.last);
       return target;
     }

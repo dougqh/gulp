@@ -218,4 +218,11 @@ public final class GulpCollections {
   public static final void print(final Stream<?> stream) {
     gulpify(stream).print();
   }
+  
+  public static final <T> GulpLog logify(
+    final Class<T> type,
+    final Collection<? extends T> collection)
+  {
+    return new CollectionBackedGulpLog<T>(type, collection);
+  }
 }

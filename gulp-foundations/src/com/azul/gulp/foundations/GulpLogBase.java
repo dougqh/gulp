@@ -15,6 +15,7 @@ import com.azul.gulp.GenericProcessor;
 import com.azul.gulp.GulpLogStream;
 import com.azul.gulp.GulpPairStream;
 import com.azul.gulp.LogProcessingException;
+import com.azul.gulp.LogProcessor;
 import com.azul.gulp.Normalizer;
 import com.azul.gulp.PackagedAnalyzer;
 import com.azul.gulp.Pair;
@@ -27,6 +28,7 @@ import com.azul.gulp.ThrowingFunction;
 import com.azul.gulp.nexus.Nexus;
 import com.azul.gulp.nexus.NexusHandler;
 import com.azul.gulp.nexus.NexusImpl;
+import com.azul.gulp.nexus.NexusUnhandler;
 import com.azul.gulp.nexus.Plugin;
 import com.azul.gulp.properties.FieldPropertyDetector;
 import com.azul.gulp.properties.KeyProperty;
@@ -363,8 +365,6 @@ public abstract class GulpLogBase<C extends GulpLogExtension<C>>
     
     try {
       this.run(engine);
-      
-      processor.finish();
     } catch ( LogProcessingException e ) {
       throw e;
     } catch ( Exception e ) {
@@ -372,6 +372,93 @@ public abstract class GulpLogBase<C extends GulpLogExtension<C>>
     }
     
     return new Result(processor);
+  }
+  
+  @Override
+  public final Result process(LogProcessor.Provider provider) {
+    return this.process(provider.get());
+  }
+  
+  @SuppressWarnings("rawtypes")
+  @Override
+  public final Result process(LogProcessor logProcessor) throws LogProcessingException {
+    final class NexusHandlerAdapter implements NexusHandler {
+      private final Processor rawProcessor;
+      
+      public NexusHandlerAdapter(final Processor rawProcessor) {
+        this.rawProcessor = rawProcessor;
+      }
+      
+      @Override
+      public void init(Nexus nexus) {
+        nexus.inject(this.rawProcessor);
+      }
+
+      @Override
+      public void handle(Object value) throws Exception {
+        this.rawProcessor.process(value);
+      }
+    }
+    
+    final class NexusUnhandlerAdapter implements NexusUnhandler {
+      private final Processor rawProcessor;
+      
+      public NexusUnhandlerAdapter(final Processor rawProcessor) {
+        this.rawProcessor = rawProcessor;
+      }
+      
+      @Override
+      public void init(Nexus nexus) {
+        nexus.inject(this.rawProcessor);
+      }
+
+      @Override
+      public void unhandle(Object value) throws Exception {
+        this.rawProcessor.process(value);
+      }
+    }
+    
+    Nexus engine = this.createEngine();
+    // not handle through a plugin, so no connect
+    engine.inject(logProcessor);
+    
+    for ( Class<?> klass: logProcessor.requiredTypes() ) {
+      Class rawKlass = (Class)klass;
+      
+      Processor rawProcessor = (Processor)logProcessor.processorFor(klass);
+      if ( rawProcessor != null ) {
+        engine.handle(rawKlass, new NexusHandlerAdapter(rawProcessor));
+      }
+      
+      Processor rawUnhandledProcessor = (Processor)logProcessor.unhandledProcessorFor(klass);
+      if ( rawUnhandledProcessor != null ) {
+        engine.unhandle(rawKlass, new NexusUnhandlerAdapter(rawUnhandledProcessor));
+      }
+    }
+    
+    for ( Class<?> klass: logProcessor.optionalTypes() ) {
+      Class rawKlass = (Class)klass;
+      
+      Processor rawProcessor = (Processor)logProcessor.processorFor(klass);
+      if ( rawProcessor != null ) {
+        engine.handle(rawKlass, new NexusHandlerAdapter(rawProcessor));
+      }
+      
+      Processor rawUnhandledProcessor = (Processor)logProcessor.unhandledProcessorFor(klass);
+      if ( rawUnhandledProcessor != null ) {
+        engine.unhandle(rawKlass, new NexusUnhandlerAdapter(rawUnhandledProcessor));
+      }
+    }
+    
+    try {
+      this.run(engine);
+    } catch ( LogProcessingException e ) {
+      throw e;
+    } catch ( Exception e ) {
+      throw new LogProcessingException(e);
+    }
+    
+    return new Result(logProcessor);
   }
   
   @Override

@@ -14,7 +14,7 @@ import com.azul.gulp.nexus.NexusHandledMarker;
 import com.azul.gulp.nexus.NexusHandler;
 import com.azul.gulp.nexus.Plugin;
 
-public class SourceBasedGulpLog<C extends GulpLogExtension<C>, S> extends GulpLogBase<C> {
+public abstract class SourceBasedGulpLog<E extends GulpLogExtension<E>, S> extends GulpLogBase<E> {
   private final SourceConverterPlugin<S> sourcePlugin;
   
   public SourceBasedGulpLog(final Source<S> source) {
@@ -27,7 +27,7 @@ public class SourceBasedGulpLog<C extends GulpLogExtension<C>, S> extends GulpLo
   }
   
   @Override
-  public final C prefetch() {
+  public final E prefetch() {
     try {
       this.source().prefetch();
     } catch ( ProcessingException e ) {
@@ -37,22 +37,14 @@ public class SourceBasedGulpLog<C extends GulpLogExtension<C>, S> extends GulpLo
     }
     
     @SuppressWarnings("unchecked")
-    C casted = (C)this;
+    E casted = (E)this;
     return casted;
   }
   
-  protected C createOffspring(final Source<S> source) {
-    @SuppressWarnings("unchecked")
-    C offspring = (C)new SourceBasedGulpLog<C, S>(source, this.normalizers());
-    return offspring;
-  }
+  protected abstract E createOffspring(final Source<S> source);
   
   @Override
-  protected C createOffspring(final PipelineConfiguration normalizers) {
-    @SuppressWarnings("unchecked")
-    C offspring = (C)new SourceBasedGulpLog<C, S>(this.sourcePlugin.source, normalizers);
-    return offspring;
-  }
+  protected abstract E createOffspring(final PipelineConfiguration normalizers);
   
   protected final <T extends Source<S>> T source() {
     @SuppressWarnings("unchecked")

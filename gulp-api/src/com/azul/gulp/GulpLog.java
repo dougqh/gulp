@@ -8,6 +8,12 @@ public interface GulpLog {
   @SuppressWarnings("rawtypes")
   public Result process(final GenericProcessor processor);
   
+  @SuppressWarnings("rawtypes")
+  public Result process(final LogProcessor processor);
+  
+  @SuppressWarnings("rawtypes")
+  public Result process(final LogProcessor.Provider processor);
+  
   public <R> Result<R> analyze(final PackagedAnalyzer<R> analyzer);
   
   public <R> Result<R> analyze(final GenericAnalyzer<R> analyzer);
